@@ -9,35 +9,92 @@ package ca.sheridancollege.project;
  * @author aryan bhardwaj, abdul basith
  * Date - June 30 , 2023
  */
-public class UnoCard extends Card{
+import java.util.Random;
+
+public class UnoCard {
     
-    public enum Color {
-        RED, GREEN, BLUE, YELLOW
+   public String color;
+    public int value;
+    private Random rand;
+    private String face;
+
+    public UnoCard(int v, String c) {
+        value = v;
+        color = c;
     }
 
-    public enum Value {
-        ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, SKIP, REVERSE, DRAW_TWO, WILD, WILD_DRAW_FOUR
+    // Creates a random card
+    public UnoCard() {
+        rand = new Random();
+        value = rand.nextInt(28); // 108 cards in a standard Uno deck. Can be reduced to 27 (disregarding colors)
+        // Assigning value
+        if (value >= 14) // Some cards are more common than others
+            value -= 14;
+        // Assigning color
+        rand = new Random();
+        switch (rand.nextInt(4)) {
+            case 0:
+                color = "Red";
+                break;
+            case 1:
+                color = "Green";
+                break;
+            case 2:
+                color = "Blue";
+                break;
+            case 3:
+                color = "Yellow";
+                break;
+        }
+        // If the card is a wild card
+        if (value >= 13)
+            color = "none";
     }
 
-    private Color color;
-    private Value value;
+    public String getFace() {
+        /* Returns the face of the card (what the player sees)
+         * Ex. [Red 5]
+         */
+        face = "[";
+        if (!color.equals("none")) {
+            face += this.color + " ";
+        }
 
-    public UnoCard(Color color, Value value) {
-        this.color = color;
-        this.value = value;
+        switch (this.value) {
+            default:
+                face += String.valueOf(this.value);
+                break;
+            case 10:
+                face += "Skip";
+                break;
+            case 11:
+                face += "Reverse";
+                break;
+            case 12:
+                face += "Draw 2";
+                break;
+            case 13:
+                face += "Wild";
+                break;
+            case 14:
+                face += "Wild Draw 4";
+                break;
+        }
+        face += "]";
+        return face;
     }
 
-    public Color getColor() {
-        return color;
+    // Determines if you can place this card on top of a given card
+    // The color needs to be specified because if a wild card was chosen in the previous round, the color would have changed, but the card staying the same
+    public boolean canPlace(UnoCard otherCard, String currentColor) {
+        if (this.color.equals(currentColor)) {
+            return true;
+        } else if (this.value == otherCard.value) {
+            return true;
+        } else if (this.color.equals("none")) { // Wild cards
+            return true;
+        }
+        return false;
     }
-
-    public Value getValue() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return color + " " + value;
-    }    
     
 }
